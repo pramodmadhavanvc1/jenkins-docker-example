@@ -1,3 +1,9 @@
-FROM openjdk
-EXPOSE 8080
-ENTRYPOINT ["java","-jar","/my-app-1.0-SNAPSHOT.jar"]
+FROM ubuntu:16.04
+
+RUN apt-get update
+RUN apt-get install -y nginx 
+RUN mkdir /tmp/docker
+RUN touch /tmp/docker/test.txt
+
+EXPOSE 80
+CMD /usr/sbin/nginx -g "daemon off;"
