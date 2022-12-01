@@ -23,7 +23,7 @@ pipeline{
                 
             }
         }
-        stage("Docker Deploy Dev"){
+        stage("Docker Deploy Worker"){
             steps{
                 sshagent(['worker-server']) {
                     sh "ssh -o StrictHostKeyChecking=no origin@10.0.2.7 docker rm -f pramodapp"
