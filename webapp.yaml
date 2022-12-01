@@ -11,11 +11,7 @@ spec:
   selector:
     matchLabels:
       app: webapp
-  template:
-    metadata:
-      labels:
-        app: webapp
-    spec:
+      spec:
       containers:
       - name: webapp
         image: "pramodmadhavan/webapp"
