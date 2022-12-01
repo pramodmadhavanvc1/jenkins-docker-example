@@ -1,0 +1,40 @@
+pipeline{
+    agent any
+    environment {
+      DOCKER_TAG = getVersion()
+    }
+	    stages{
+        stage("Git Checkout"){
+            steps{
+                checkout([$class: 'GitSCM', branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/pramodmadhavanvc1/jenkins-docker-example.git']]])
+            }
+        }
+        stage("Docker Build"){
+            steps{
+                sh "docker build . -t  pramodmadhavan/webapp:${DOCKER_TAG}"
+            }
+        }
+        stage("DockerHub Push"){
+            steps{
+                withCredentials([string(credentialsId: 'docker-hub', variable: 'dockerHubPwd')]) {
+                    sh "docker login -u pramodmadhavan -p ${dockerHubPwd}"
+                    sh "docker push pramodmadhavan/webapp:${DOCKER_TAG} "
+                }
+                
+            }
+        }
+        stage("Docker Deploy Dev"){
+            steps{
+                sshagent(['worker-server']) {
+                    sh "ssh -o StrictHostKeyChecking=no origin@10.0.2.7 docker rm -f pramodapp"
+                    sh "ssh origin@10.0.2.7 docker run -d -p 31315:80 --name pramodapp pramodmadhavan/webapp:${DOCKER_TAG}"
+                }
+                
+            }
+        }
+    }
+}
+def getVersion(){
+    def commitHash = sh returnStdout: true, script: 'git rev-parse --short HEAD'
+    return commitHash
+}
