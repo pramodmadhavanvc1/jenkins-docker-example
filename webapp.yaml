@@ -11,7 +11,11 @@ spec:
   selector:
     matchLabels:
       app: webapp
-      spec:
+  template:
+    metadata:
+      labels:
+        app: webapp
+    spec:
       containers:
       - name: webapp
         image: "pramodmadhavan/webapp"
@@ -31,4 +35,3 @@ spec:
   - name: http
     targetPort: 3000
     port: 80
-    nodePort:31004
