@@ -1,7 +1,8 @@
 pipeline{
     agent any
     environment {
-      DOCKER_TAG = getVersion()
+      version = getVersion()
+      appname = getname()
     }
 	    stages{
         stage("Git Checkout"){
@@ -11,18 +12,15 @@ pipeline{
         }
         stage("Docker Build"){
             steps{
-	        sh "version=`cat version |grep version |awk '{print \$2}'`"
-                sh "name=`cat version |grep name |awk '{print \$2}'`"
-		sh "echo ${name}"
-		sh "echo ${version}"
-                sh "docker build . -t  pramodmadhavan/${name}:${version}"
+	        
+                sh "docker build . -t  pramodmadhavan/${appname}:${version}"
             }
         }
         stage("DockerHub Push"){
             steps{
                 withCredentials([string(credentialsId: 'docker-hub', variable: 'dockerHubPwd')]) {
                     sh "docker login -u pramodmadhavan -p ${dockerHubPwd}"
-                    sh "docker push pramodmadhavan/${name}:${version}"
+                    sh "docker push pramodmadhavan/${appname}:${version}"
                 }
                 
             }
@@ -31,7 +29,7 @@ pipeline{
             steps{
                 sshagent(['worker-server']) {
                     sh "ssh -o StrictHostKeyChecking=no origin@10.0.2.7 docker rm -f pramodapp"
-                    sh "ssh origin@10.0.2.7 docker run -d -p 31315:80 --name pramodapp pramodmadhavan/${name}:${version}"
+                    sh "ssh origin@10.0.2.7 docker run -d -p 31315:80 --name pramodapp pramodmadhavan/${appname}:${version}"
                 }
                 
             }
@@ -39,6 +37,12 @@ pipeline{
     }
 }
 def getVersion(){
-    def commitHash = sh returnStdout: true, script: 'git rev-parse --short HEAD'
-    return commitHash
+    def version = sh returnStdout: true, script: 'cat version |grep version |awk '{print $2}''
+    return version
 }
+
+def getname(){
+
+    def name = sh returnStdout: true, script: 'cat version |grep name |awk '{print $2}''
+    return name
+    }
