@@ -13,6 +13,8 @@ pipeline{
             steps{
 	        sh "version=`cat version |grep version |awk '{print \$2}'`"
                 sh "name=`cat version |grep name |awk '{print \$2}'`"
+		sh "echo ${name}"
+		sh "echo ${version}"
                 sh "docker build . -t  pramodmadhavan/${name}:${version}"
             }
         }
