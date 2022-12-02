@@ -37,10 +37,10 @@ pipeline{
     }
 }
 def getVersion(){
-    version = sh(returnStdout: true, script: "cat version |grep version |awk '{print $2}'")
+    version = sh(returnStdout: true, script: "cat version |grep version |awk '{print \$2}'")
     return version
 }
 def getname(){
-    name = sh(returnStdout: true, script: "cat version |grep name |awk '{print $2}'")
+    name = sh(returnStdout: true, script: "cat version |grep name |awk '{print \$2}'")
     return name
     }
