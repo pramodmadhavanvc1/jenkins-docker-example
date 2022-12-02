@@ -13,7 +13,7 @@ pipeline{
         stage("Docker Build"){
             steps{
 	        
-                sh "docker build -f Dockerfile --tag pramodmadhavan/${appname}:${version} ."
+                sh "docker build -f Dockerfile --tag pramodmadhavan/${appname}:${version} "
             }
         }
         stage("DockerHub Push"){
