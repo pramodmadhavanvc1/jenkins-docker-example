@@ -11,14 +11,16 @@ pipeline{
         }
         stage("Docker Build"){
             steps{
-                sh "docker build . -t  pramodmadhavan/webapp:${DOCKER_TAG}"
+	        sh "version=`cat version |grep version |awk '{print $2}'`"
+                sh "name=`cat version |grep name |awk '{print $2}'`"
+                sh "docker build . -t  pramodmadhavan/$name:${version}"
             }
         }
         stage("DockerHub Push"){
             steps{
                 withCredentials([string(credentialsId: 'docker-hub', variable: 'dockerHubPwd')]) {
                     sh "docker login -u pramodmadhavan -p ${dockerHubPwd}"
-                    sh "docker push pramodmadhavan/webapp:${DOCKER_TAG} "
+                    sh "docker push pramodmadhavan/$name:${version}"
                 }
                 
             }
@@ -27,7 +29,7 @@ pipeline{
             steps{
                 sshagent(['worker-server']) {
                     sh "ssh -o StrictHostKeyChecking=no origin@10.0.2.7 docker rm -f pramodapp"
-                    sh "ssh origin@10.0.2.7 docker run -d -p 31315:80 --name pramodapp pramodmadhavan/webapp:${DOCKER_TAG}"
+                    sh "ssh origin@10.0.2.7 docker run -d -p 31315:80 --name pramodapp pramodmadhavan/$name:${version}"
                 }
                 
             }
