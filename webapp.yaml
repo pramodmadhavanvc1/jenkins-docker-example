@@ -1,37 +1,28 @@
 ---
-kind: Deployment
-apiVersion: apps/v1
+apiVersion: v1
+kind: Pod
 metadata:
   name: webapp
-  namespace: myweb
   labels:
-    app: webapp
+     app: frontend
 spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: webapp
-  template:
-    metadata:
-      labels:
-        app: webapp
-    spec:
-      containers:
-      - name: webapp
-        image: "pramodmadhavan/webapp"
-        ports:
-          - containerPort: 3000
+  containers:
+   - name: webapp
+     image: pramodmadhavan/webapp:8e197e8
+     ports:
+      - containerPort: 80
 ---
 apiVersion: v1
 kind: Service
 metadata:
+  labels:
+    app: frontend
   name: webapp
-  namespace: myweb
 spec:
-  selector:
-    app: webapp
-  type: NodePort
   ports:
-  - name: http
-    targetPort: 3000
-    port: 80
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: frontend
+  type: NodePort
